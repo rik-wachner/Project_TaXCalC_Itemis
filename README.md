@@ -77,6 +77,10 @@ provided by Pohl and Rupp [\[1, pp. 71–75\]](#a-bibliography) is used.
 | REQ 4 | The SYSTEM SHALL PROVIDE the user WITH THE ABILITY to see the receipt which lists, besides REQ 3, the total cost of the items, and the total amount of sales taxes | "\[...\] finishing with the total cost of the items, and the total amounts of sales taxes paid." [\[Itemis challenge description, sentence 3\]](#ii-challenge-description)
 | REQ 5 | The SYSTEM SHALL calculate the sales tax with the following formular: `n*p/100`; for a tax rate of `n%` and a price of `p` | "The rounding rules for sales tax are that for a tax rate of n%, a shelf price of p contains (np/100 rounded up to the nearest 0.05) amount of sales tax." [\[Itemis challenge description, sentence 4\]](#ii-challenge-description)
 
+## IV. Architectural Design
+
+![TaXCalC Class Diagram](doc_src/taxcalc_class_diagram.png "TaXCalC Class Diagram")
+
 ## A. Bibliography
 1. Klaus Pohl and Chris Rupp, "Basiswissen Requirements Engineering: Ausund Weiterbildung nach IREB-Standard zum
 Certified Professional for Requirements Engineering Foundation Level", in 5th ed., ser. iSQI-Reihe.
