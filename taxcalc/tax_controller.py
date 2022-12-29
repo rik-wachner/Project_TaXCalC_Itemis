@@ -46,7 +46,7 @@ class TaxController:
             )
             self.taxProducts.append(new_product)
             # new_product.getProductInformation() == product_information
-            # @ TODO Inform UI about change
+            self.view.display_new_record(new_product.getProductInformation())
         except Exception as err:
             pass
 

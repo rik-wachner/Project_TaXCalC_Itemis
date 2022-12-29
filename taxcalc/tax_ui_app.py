@@ -13,9 +13,23 @@ class TaxUIApp(customtkinter.CTk):
 
         self.width = width
         self.height = height
-        #self.language_code = language_code @TODO Add language support later
+        # self.language_code = language_code @TODO Add language support later
         # set connected controller to None in init
         self.connected_controller = None
+
+        def __set_treeview_columns(treeview: tkinter.ttk.Treeview, column_names: dict):
+            column_names_keys = column_names.keys()
+            # Using tuple() for unpacking dictionary keys into tuple
+            treeview['columns'] = tuple(column_names_keys)  # var refs
+            # ("product_name", "product_quantity", "product_price", "product_import_state")
+
+            # Formate / "remove" the treeview index columns
+            treeview.column("#0", width=0, stretch="no")
+
+            # Formatting the Heading and the Column for each name
+            for key in column_names_keys:
+                treeview.heading(key, text=column_names[key])
+                treeview.column(key, anchor="w", width=120)
 
         # configure window
         self.title("TaXCalC")
@@ -28,8 +42,20 @@ class TaxUIApp(customtkinter.CTk):
         self.grid_rowconfigure((0, 1), weight=1)
 
         # Receipt input field
-        self.textbox = customtkinter.CTkTextbox(self)
-        self.textbox.grid(row=0, column=0, columnspan=4, padx=(20, 20), pady=(20, 0), sticky="nsew")
+        self.treeview = tkinter.ttk.Treeview(self, show="headings")
+        self.treeview.grid(row=0, column=0, columnspan=4, padx=(20, 20), pady=(20, 0), sticky="nsew")
+        # Set the Table columns to the TaxProduct language
+        __set_treeview_columns(
+            self.treeview,
+            {
+                # "product_id": "ID",
+                "product_name": "Product",
+                "product_quantity": "Quantity (Unit)",
+                "product_price": "Price ($)",
+                "product_basic_tax": "Tax (%)",
+                "product_import_state": "Imported",
+            }
+        )
 
         # create checkbox and switch frame
         self.tax_input_frame = customtkinter.CTkFrame(self)
@@ -158,7 +184,7 @@ class TaxUIApp(customtkinter.CTk):
         """
         chosen_basic_tax_option = self.basic_tax.get()
         basic_tax = 0
-        #position_of_tax_translation = tax_translation.index(chosen_basic_tax_option)
+        # position_of_tax_translation = tax_translation.index(chosen_basic_tax_option)
         if chosen_basic_tax_option == "10%":
             basic_tax = 10
         self.add_new_product(
@@ -167,6 +193,43 @@ class TaxUIApp(customtkinter.CTk):
             product_price=self.product_price.get(),
             product_basic_tax=basic_tax,
             product_import_state=bool(self.import_checkbox.get())
+        )
+
+    def display_new_record(self, product_information: dict):
+        """
+        Add the new product record to the treeview table
+
+        The information of the product has the following structure:
+
+        product_information: dict = {
+            "product_name": <the product name>,
+            "product_quantity": <the product quantity>,
+            "product_price": <the product price>,
+            "product_basic_tax": <the product basic tax rate>,
+            "product_import_state": <the product import state>
+        }
+
+        :param product_information: Map with the required product information to create a new TaxProduct object
+        :type product_information: dict
+        :return: None
+        :rtype: None
+        """
+        # Visual Change
+        #   > For the UI, change 'True' / 'False' to 'YES' / 'NO' (eng version)
+        product_import_state_word = "YES" if product_information["product_import_state"] else "NO"
+
+        # Add the new record to the treeview widget in the ui
+        self.treeview.insert(
+            parent='',
+            index='end',
+            text='',
+            values=(
+                product_information["product_name"],
+                product_information["product_quantity"],
+                product_information["product_price"],
+                product_information["product_basic_tax"],
+                product_import_state_word
+            )
         )
 
     def reset_calculation_click(self):
