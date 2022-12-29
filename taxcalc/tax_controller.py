@@ -1,10 +1,11 @@
-from taxcalc.tax_error_handling import TaxBaseError
+#from taxcalc.tax_error_handling import TaxBaseError @TODO Add error handling class later
 from taxcalc.tax_product import TaxProduct
 
 
 class TaxController:
-    def __init__(self, width: int, height: int, language_code: str):
-        pass
+    def __init__(self, view: any):
+        self.view = view
+        self.taxProducts: list[TaxProduct] = []
 
     @staticmethod
     def _check_product_information(product_information: dict):
