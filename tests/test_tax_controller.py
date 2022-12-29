@@ -23,6 +23,50 @@ def create_dummy_tax_ui_object(request):
 # @TODO
 
 ###
+# __check_product_information_product()
+###
+def test__check_product_information_product_name_to_long_exception(create_dummy_tax_ui_object):
+    dummy_product: dict = {
+        "product_name": "A" * 51,
+        "product_quantity": 1,
+        "product_price": 14.99,
+        "product_basic_tax": 10,
+        "product_import_state": False
+    }
+    tax_controller = controller.TaxController(create_dummy_tax_ui_object)
+    with pytest.raises(error_handling.TaxBaseError) as exc_info:
+        tax_controller._check_product_information(product_information=dummy_product)
+    assert exc_info.type == error_handling.TaxBaseError
+
+
+def test__check_product_information_product_quantity_over_99_exception(create_dummy_tax_ui_object):
+    dummy_product: dict = {
+        "product_name": "book",
+        "product_quantity": 100,
+        "product_price": 14.99,
+        "product_basic_tax": 10,
+        "product_import_state": False
+    }
+    tax_controller = controller.TaxController(create_dummy_tax_ui_object)
+    with pytest.raises(error_handling.TaxBaseError) as exc_info:
+        tax_controller._check_product_information(product_information=dummy_product)
+    assert exc_info.type == error_handling.TaxBaseError
+
+
+def test__check_product_information_product_quantity_under_1_exception(create_dummy_tax_ui_object):
+    dummy_product: dict = {
+        "product_name": "book",
+        "product_quantity": 0,
+        "product_price": 14.99,
+        "product_basic_tax": 10,
+        "product_import_state": False
+    }
+    tax_controller = controller.TaxController(create_dummy_tax_ui_object)
+    with pytest.raises(error_handling.TaxBaseError) as exc_info:
+        tax_controller._check_product_information(product_information=dummy_product)
+    assert exc_info.type == error_handling.TaxBaseError
+
+###
 # __round_tax()
 ###
 @pytest.mark.parametrize(
