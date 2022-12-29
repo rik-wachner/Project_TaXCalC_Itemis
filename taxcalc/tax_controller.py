@@ -89,7 +89,83 @@ class TaxController:
 
     @staticmethod
     def _round_tax(tax_number: float, solution_calc_engine: str = "t4z") -> float:
-        pass
+        """
+        Round a given tax float to the nearest 0.05 base by a chosen solution engine
+
+        Engine 1 by myself -> solution_calc_engine: str = "rik"
+        Engine 2 by t4z -> solution_calc_engine: str = "t4z"
+        Engine 3 by john -> solution_calc_engine: str = "john"
+
+        :param tax_number: taxed value as float
+        :type tax_number: float
+        :param solution_calc_engine: chosen solution engine to round the tax number
+        :type solution_calc_engine: str
+        :return: rounded tax number
+        :rtype: float
+        """
+        def __round_decimal_by_rik(float_number: float) -> float:
+            """
+            Round decimal number to the nearest base by myself :)
+            :param float_number: float tax number to round to the nearest 0.05
+            :type float_number: float
+            :return: rounded tax float
+            :rtype: float
+            """
+            rounded_float_number = round(float_number, 2)
+            integer_string, decimal_string = f"{rounded_float_number:.2f}".split(".")
+            decimal_up_rounding_condition = int(decimal_string[1])
+            diff_to_add = 0
+            if 0 < decimal_up_rounding_condition < 5:
+                diff_to_add = 5 - decimal_up_rounding_condition  # calculate diff to 5
+            elif decimal_up_rounding_condition > 5:
+                diff_to_add = 10 - decimal_up_rounding_condition  # calculate diff to 10
+            # Add diff (if nessesary) to rounded number
+            rounded_float_number += float(f"0.0{diff_to_add}")
+            return rounded_float_number
+
+        def __round_decimal_by_t4z(decimal_number: float) -> float:
+            """
+            Round decimal number to the nearest base by 't4z' on Stack Overflow
+            Profile: https://stackoverflow.com/users/3380169/t4z
+            Thread: https://stackoverflow.com/questions/37825909/round-python-decimal-to-nearest-0-05
+            Note: This is not the best solution because -> 423.10 -> 423.15
+            :param decimal_number: decimal number to round to the nearest base
+            :type decimal_number: float
+            :return: rounded tax float
+            :rtype: float
+            """
+            from decimal import Decimal, ROUND_UP
+            round_decimal = Decimal("0.05") * (Decimal(decimal_number) / Decimal("0.05")).quantize(
+                1,
+                rounding=ROUND_UP
+            )
+            return float(round_decimal)
+
+        # Solution provided in The Web Dev by John Au-Yeung
+        # URL: https://thewebdev.info/2022/02/06/how-to-round-up-to-the-nearest-0-05-in-javascript/
+        def __round_decimal_by_john(decimal_number: float) -> float:
+            """
+            Round float number to the nearest base by 'John Au-Yeung' on The Web Dev
+            Profile: https://thewebdev.info/author/admin/
+            Thread: https://thewebdev.info/2022/02/06/how-to-round-up-to-the-nearest-0-05-in-javascript/
+            :param decimal_number: decimal number to round to the nearest base
+            :type decimal_number: float
+            :return: rounded tax float
+            :rtype: float
+            """
+            import math
+            # With this line the function can be fixed for decimal_values like 0.555555 or 0.05555
+            #decimal_number = round(decimal_number, 2)
+            calculated_number = round(math.ceil(decimal_number * 20) / 20, 2)
+            return calculated_number
+
+        round_tax_solutions: dict = {
+            "rik": __round_decimal_by_rik,
+            "t4z": __round_decimal_by_t4z,
+            "john": __round_decimal_by_john
+        }
+        engine_function = round_tax_solutions.get(solution_calc_engine, "Invalid Engine")
+        return round(engine_function(tax_number), 2)
 
     def add_product(self, product_information: dict):
         """
