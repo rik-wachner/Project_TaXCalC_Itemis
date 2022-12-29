@@ -211,7 +211,7 @@ class TaxUIApp(customtkinter.CTk):
         self.connected_controller.reset_calculation()
 
     def show_receipt_click(self):
-        pass
+        self.connected_controller.calculate_receipt()
 
     def add_new_product(
             self,
@@ -297,8 +297,26 @@ class TaxUIApp(customtkinter.CTk):
     def error_handling(self, message: str):
         self.__show_error_popup_message(message)
 
-    def show_receipt(self):
-        pass
+    def show_receipt(self, receipt_details: dict):
+        message_str = ""
+        receipt_total_details = receipt_details["receipt_total"]
+        product_details = receipt_details["products"]
+        for product in product_details:
+            import_statement = (
+                    "imported" + " "
+            ) if product_details[product]['import_state'] else ""
+            message_str += \
+                f"{product_details[product]['quantity']}" + \
+                " " \
+                f"{import_statement} {product_details[product]['product_name']}:" + \
+                " " \
+                f"{product_details[product]['taxed_price']}" + \
+                "\n"
+        # Add sales tex to string
+        message_str += f"Sales Tax: {receipt_total_details['sales_tax']}" + "\n"
+        # Add total amount to string
+        message_str += f"Total: {receipt_total_details['total']}"
+        self.__show_receipt_popup_message(message=message_str)
 
     def __show_error_popup_message(self, message: str):
         # Create a new popup window
@@ -318,3 +336,28 @@ class TaxUIApp(customtkinter.CTk):
             command=popup_window.destroy
         )
         accept_button.pack(padx=20, pady=20)
+
+    def __show_receipt_popup_message(self, message: str):
+        # Create a new popup window
+        popup_window = customtkinter.CTkToplevel(self)
+        popup_window.geometry("700x350")
+        popup_window.resizable(False, False)
+        popup_window.title("TaXCalC")
+        popup_window.grab_set()
+
+        # create textbox on CTkToplevel window
+        receipt_textbox = customtkinter.CTkTextbox(popup_window)
+        # receipt_textbox.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        receipt_textbox.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+        # Insert text into the textbox and then disable it
+        #   > state="disabled" -> Read Only
+        receipt_textbox.insert(index="1.0", text=message)
+        receipt_textbox.configure(state="disabled")
+
+        accept_button = customtkinter.CTkButton(
+            master=popup_window,
+            font=customtkinter.CTkFont(size=13, weight="bold"),
+            text="OK",
+            command=popup_window.destroy
+        )
+        accept_button.pack(padx=20, pady=(10, 20))

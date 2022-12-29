@@ -28,6 +28,7 @@ class TaxController:
         :return: None or raised TaxBaseError exception
         :rtype: None or a TaxBaseError exception object
         """
+
         def __check_missing_content():
             """
             Check if the product information content contains missing entries ("" or NULL) in the following structure:
@@ -103,6 +104,7 @@ class TaxController:
         :return: rounded tax number
         :rtype: float
         """
+
         def __round_decimal_by_rik(float_number: float) -> float:
             """
             Round decimal number to the nearest base by myself :)
@@ -141,8 +143,6 @@ class TaxController:
             )
             return float(round_decimal)
 
-        # Solution provided in The Web Dev by John Au-Yeung
-        # URL: https://thewebdev.info/2022/02/06/how-to-round-up-to-the-nearest-0-05-in-javascript/
         def __round_decimal_by_john(decimal_number: float) -> float:
             """
             Round float number to the nearest base by 'John Au-Yeung' on The Web Dev
@@ -155,7 +155,7 @@ class TaxController:
             """
             import math
             # With this line the function can be fixed for decimal_values like 0.555555 or 0.05555
-            #decimal_number = round(decimal_number, 2)
+            # decimal_number = round(decimal_number, 2)
             calculated_number = round(math.ceil(decimal_number * 20) / 20, 2)
             return calculated_number
 
@@ -202,11 +202,60 @@ class TaxController:
         except ValueError as buildin_value_error:
             self.view.error_handling(message=str(buildin_value_error))
 
-    def calculate_receipt(self, a, b):
-        pass
+    def calculate_receipt(self):
+        receipt = self.calculate_total()
+        self.view.show_receipt(receipt)
 
     def calculate_total(self) -> dict:
-        pass
+        """
+        Calculating the total cost of the items and the total amounts of sales taxes
+
+        The rounding rules for sales tax are that for a tax rate of n%,
+        a shelf price of p contains (np/100 rounded up to the nearest 0.05)
+        amount of sales tax.
+
+        tax = n*p/100; for a tax rate of n% and a price of p
+
+        :return:
+        :rtype: dict
+        """
+        product_calculation_info = {}
+        total_sales_tax = 0.0
+        total = 0.0
+        for index, product in enumerate(self.taxProducts):
+            product_name = getattr(product, "name")
+            product_price = getattr(product, "price")
+            product_quantity = getattr(product, "quantity")
+            basic_tax = getattr(product, 'basic_tax')
+            import_state = getattr(product, 'import_sate')
+            tax = basic_tax + (5 if import_state else 0)
+            # The rounding rules for sales tax are that for a tax
+            # rate of n%, a shelf price of p contains (np/100 rounded up to the nearest 0.05) amount of
+            # sales tax.
+            product_tax = tax * product_price / 100
+            rounded_tax_value = self._round_tax(tax_number=product_tax, solution_calc_engine="rik")
+            product_taxed_price = round(((product_price + rounded_tax_value) * product_quantity), 2)
+            # print("TAX RATE:", tax)
+            # print(f"TAX FEE: {product_tax} -> {rounded_tax_value}")
+            # print(f"PRODUCT PRICE: {product_price} -> {product_tax_price}")
+            total_sales_tax += rounded_tax_value * product_quantity
+            total += product_taxed_price
+            # Add product to dict for ui data transfer
+            product_calculation_info[index] = {
+                "product_name": product_name,
+                "import_state": import_state,
+                "quantity": product_quantity,
+                "taxed_price": product_taxed_price
+            }
+        receipt_calculation = {
+            "receipt_total": {
+                "sales_tax": round(total_sales_tax, 2),
+                "total": round(total, 2)
+            },
+            "products": product_calculation_info
+        }
+        print(receipt_calculation)
+        return receipt_calculation
 
     def reset_calculation(self):
         self.taxProducts = []
