@@ -294,5 +294,27 @@ class TaxUIApp(customtkinter.CTk):
         )
         self.__clear_input_fields()
 
+    def error_handling(self, message: str):
+        self.__show_error_popup_message(message)
+
     def show_receipt(self):
         pass
+
+    def __show_error_popup_message(self, message: str):
+        # Create a new popup window
+        popup_window = customtkinter.CTkToplevel(self)
+        popup_window.geometry("500x150")
+        popup_window.resizable(False, False)
+        popup_window.title("TaXCalC")
+        popup_window.grab_set()
+
+        # create label on CTkToplevel window
+        message_label = customtkinter.CTkLabel(popup_window, text=message)
+        message_label.pack(side="top", fill="both", expand=True, padx=10, pady=10)
+        accept_button = customtkinter.CTkButton(
+            master=popup_window,
+            font=customtkinter.CTkFont(size=13, weight="bold"),
+            text="OK",
+            command=popup_window.destroy
+        )
+        accept_button.pack(padx=20, pady=20)
