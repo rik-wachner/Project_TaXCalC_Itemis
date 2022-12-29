@@ -165,6 +165,17 @@ class TaxUIApp(customtkinter.CTk):
         )
         self.show_receipt_button.grid(row=1, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
+    def __clear_input_fields(self):
+        """
+        For a better usability, the function clears all used input fields
+        :return: None
+        :rtype: None
+        """
+        self.product_name.delete(0, "end")
+        self.product_quantity.delete(0, "end")
+        self.product_price.delete(0, "end")
+        self.import_checkbox.deselect()
+
     def add_controller_listener(self, controller: TaxController):
         """
         Register a controller to be able to pass click events and information
@@ -194,43 +205,7 @@ class TaxUIApp(customtkinter.CTk):
             product_basic_tax=basic_tax,
             product_import_state=bool(self.import_checkbox.get())
         )
-
-    def display_new_record(self, product_information: dict):
-        """
-        Add the new product record to the treeview table
-
-        The information of the product has the following structure:
-
-        product_information: dict = {
-            "product_name": <the product name>,
-            "product_quantity": <the product quantity>,
-            "product_price": <the product price>,
-            "product_basic_tax": <the product basic tax rate>,
-            "product_import_state": <the product import state>
-        }
-
-        :param product_information: Map with the required product information to create a new TaxProduct object
-        :type product_information: dict
-        :return: None
-        :rtype: None
-        """
-        # Visual Change
-        #   > For the UI, change 'True' / 'False' to 'YES' / 'NO' (eng version)
-        product_import_state_word = "YES" if product_information["product_import_state"] else "NO"
-
-        # Add the new record to the treeview widget in the ui
-        self.treeview.insert(
-            parent='',
-            index='end',
-            text='',
-            values=(
-                product_information["product_name"],
-                product_information["product_quantity"],
-                product_information["product_price"],
-                product_information["product_basic_tax"],
-                product_import_state_word
-            )
-        )
+        self.__clear_input_fields()
 
     def reset_calculation_click(self):
         pass
@@ -269,6 +244,44 @@ class TaxUIApp(customtkinter.CTk):
             "product_import_state": product_import_state
         }
         self.connected_controller.add_product(product_information)
+
+    def display_new_record(self, product_information: dict):
+        """
+        Add the new product record to the treeview table
+
+        The information of the product has the following structure:
+
+        product_information: dict = {
+            "product_name": <the product name>,
+            "product_quantity": <the product quantity>,
+            "product_price": <the product price>,
+            "product_basic_tax": <the product basic tax rate>,
+            "product_import_state": <the product import state>
+        }
+
+        :param product_information: Map with the required product information to create a new TaxProduct object
+        :type product_information: dict
+        :return: None
+        :rtype: None
+        """
+        # Visual Change
+        #   > For the UI, change 'True' / 'False' to 'YES' / 'NO' (eng version)
+        product_import_state_word = "YES" if product_information["product_import_state"] else "NO"
+
+        # Add the new record to the treeview widget in the ui
+        self.treeview.insert(
+            parent='',
+            index='end',
+            text='',
+            values=(
+                product_information["product_name"],
+                product_information["product_quantity"],
+                product_information["product_price"],
+                product_information["product_basic_tax"],
+                product_import_state_word
+            )
+        )
+        self.__clear_input_fields()
 
     def show_receipt(self):
         pass
