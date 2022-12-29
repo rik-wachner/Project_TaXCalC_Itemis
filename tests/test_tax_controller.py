@@ -23,7 +23,7 @@ def create_dummy_tax_ui_object(request):
 # @TODO
 
 ###
-# __check_product_information_product()
+# __check_product_information()
 ###
 def test__check_product_information_product_name_to_long_exception(create_dummy_tax_ui_object):
     dummy_product: dict = {
@@ -65,6 +65,7 @@ def test__check_product_information_product_quantity_under_1_exception(create_du
     with pytest.raises(error_handling.TaxBaseError) as exc_info:
         tax_controller._check_product_information(product_information=dummy_product)
     assert exc_info.type == error_handling.TaxBaseError
+
 
 ###
 # __round_tax()
@@ -167,3 +168,65 @@ def test__round_tax_john(create_dummy_tax_ui_object, tax_float, tax_expectation)
     tax_controller = controller.TaxController(create_dummy_tax_ui_object)
     rounded_tax = tax_controller._round_tax(tax_number=tax_float, solution_calc_engine="john")
     assert rounded_tax == tax_expectation
+
+###
+# _add_product()
+###
+@pytest.mark.parametrize(
+    "product_information",
+    [
+        {
+            "product_name": "",
+            "product_quantity": 1,
+            "product_price": 12.49,
+            "product_basic_tax": 0,
+            "product_import_state": False
+        },
+        {
+            "product_name": None,
+            "product_quantity": 1,
+            "product_price": 12.49,
+            "product_basic_tax": 0,
+            "product_import_state": False
+        },
+        {
+            "product_name": "book",
+            "product_quantity": None,
+            "product_price": 12.49,
+            "product_basic_tax": 0,
+            "product_import_state": False
+        },
+        {
+            "product_name": "book",
+            "product_quantity": 1,
+            "product_price": None,
+            "product_basic_tax": 0,
+            "product_import_state": False
+        },
+        {
+            "product_name": "book",
+            "product_quantity": 1,
+            "product_price": 12.49,
+            "product_basic_tax": None,
+            "product_import_state": False
+        },
+        {
+            "product_name": "book",
+            "product_quantity": 1,
+            "product_price": 12.49,
+            "product_basic_tax": 0,
+            "product_import_state": None
+        }
+    ]
+)
+def test__add_product_with_missing_entry(create_dummy_tax_ui_object, product_information):
+    """
+    Test if the add_product() function do not add products with missing information
+    -> The testing of reg missing infos correct are referted to _check_product_information()
+    """
+    # with pytest.raises(error_handling.TaxBaseError) as exc_info:
+    tax_controller = controller.TaxController(create_dummy_tax_ui_object)
+    tax_controller.add_product(product_information=product_information)
+    # Test that products with missing information will not be added
+    assert tax_controller.taxProducts == []
+    # assert exc_info.type == error_handling.TaxBaseError
