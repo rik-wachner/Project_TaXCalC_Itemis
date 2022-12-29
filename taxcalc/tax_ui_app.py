@@ -208,7 +208,7 @@ class TaxUIApp(customtkinter.CTk):
         self.__clear_input_fields()
 
     def reset_calculation_click(self):
-        pass
+        self.connected_controller.reset_calculation()
 
     def show_receipt_click(self):
         pass
@@ -244,6 +244,17 @@ class TaxUIApp(customtkinter.CTk):
             "product_import_state": product_import_state
         }
         self.connected_controller.add_product(product_information)
+
+    def reset_calculation(self):
+        """
+        Delete each element in the treeview and clear the ui input fields as a reset
+        :return: None
+        :rtype: None
+        """
+        # List of all elements in the tree view
+        for record in self.treeview.get_children():
+            self.treeview.delete(record)
+        self.__clear_input_fields()
 
     def display_new_record(self, product_information: dict):
         """

@@ -57,4 +57,5 @@ class TaxController:
         pass
 
     def reset_calculation(self):
-        pass
+        self.taxProducts = []
+        self.view.reset_calculation()
