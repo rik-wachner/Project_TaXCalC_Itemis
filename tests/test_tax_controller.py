@@ -169,8 +169,9 @@ def test__round_tax_john(create_dummy_tax_ui_object, tax_float, tax_expectation)
     rounded_tax = tax_controller._round_tax(tax_number=tax_float, solution_calc_engine="john")
     assert rounded_tax == tax_expectation
 
+
 ###
-# _add_product()
+# add_product()
 ###
 @pytest.mark.parametrize(
     "product_information",
@@ -219,7 +220,7 @@ def test__round_tax_john(create_dummy_tax_ui_object, tax_float, tax_expectation)
         }
     ]
 )
-def test__add_product_with_missing_entry(create_dummy_tax_ui_object, product_information):
+def test_add_product_with_missing_entry(create_dummy_tax_ui_object, product_information):
     """
     Test if the add_product() function do not add products with missing information
     -> The testing of reg missing infos correct are referted to _check_product_information()
@@ -230,3 +231,214 @@ def test__add_product_with_missing_entry(create_dummy_tax_ui_object, product_inf
     # Test that products with missing information will not be added
     assert tax_controller.taxProducts == []
     # assert exc_info.type == error_handling.TaxBaseError
+
+
+###
+# calculate_total()
+###
+@pytest.mark.parametrize(
+    "products, expected_sales_tax, expected_total",
+    [
+        # Wanted Output of Input 1
+        (
+                [
+                    {
+                        "product_name": "book",
+                        "product_quantity": 1,
+                        "product_price": 12.49,
+                        "product_basic_tax": 0,
+                        "product_import_state": False
+                    },
+                    {
+                        "product_name": "music CD",
+                        "product_quantity": 1,
+                        "product_price": 14.99,
+                        "product_basic_tax": 10,
+                        "product_import_state": False
+                    },
+                    {
+                        "product_name": "chocolate bar",
+                        "product_quantity": 1,
+                        "product_price": 0.85,
+                        "product_basic_tax": 0,
+                        "product_import_state": False
+                    },
+                ],
+                1.50,
+                29.83
+        ),
+        # Wanted Output of Input 2
+        (
+                [
+                    {
+                        "product_name": "box of chocolates",
+                        "product_quantity": 1,
+                        "product_price": 10.00,
+                        "product_basic_tax": 0,
+                        "product_import_state": True
+                    },
+                    {
+                        "product_name": "bottle of perfum",
+                        "product_quantity": 1,
+                        "product_price": 47.50,
+                        "product_basic_tax": 10,
+                        "product_import_state": True
+                    }
+                ],
+                7.65,
+                65.15
+        ),
+        # Wanted Output of Input 3
+        (
+                [
+                    {
+                        "product_name": "bottle of perfume",
+                        "product_quantity": 1,
+                        "product_price": 27.99,
+                        "product_basic_tax": 10,
+                        "product_import_state": True
+                    },
+                    {
+                        "product_name": "bottle of perfume",
+                        "product_quantity": 1,
+                        "product_price": 18.99,
+                        "product_basic_tax": 10,
+                        "product_import_state": False
+                    },
+                    {
+                        "product_name": "packet of headache pills",
+                        "product_quantity": 1,
+                        "product_price": 9.75,
+                        "product_basic_tax": 0,
+                        "product_import_state": False
+                    },
+                    {
+                        "product_name": "box of imported chocolates",
+                        "product_quantity": 1,
+                        "product_price": 11.25,
+                        "product_basic_tax": 0,
+                        "product_import_state": True
+                    }
+                ],
+                6.70,
+                74.68
+        ),
+        # OWN Test Case #1 - No Products
+        (
+                [],
+                0.0,
+                0.0
+        ),
+        # OWN Test Case #2 - 2x Wanted Output of Input 3
+        (
+                [
+                    {
+                        "product_name": "bottle of perfume",
+                        "product_quantity": 2,
+                        "product_price": 27.99,
+                        "product_basic_tax": 10,
+                        "product_import_state": True
+                    },
+                    {
+                        "product_name": "bottle of perfume",
+                        "product_quantity": 2,
+                        "product_price": 18.99,
+                        "product_basic_tax": 10,
+                        "product_import_state": False
+                    },
+                    {
+                        "product_name": "packet of headache pills",
+                        "product_quantity": 2,
+                        "product_price": 9.75,
+                        "product_basic_tax": 0,
+                        "product_import_state": False
+                    },
+                    {
+                        "product_name": "box of imported chocolates",
+                        "product_quantity": 2,
+                        "product_price": 11.25,
+                        "product_basic_tax": 0,
+                        "product_import_state": True
+                    }
+                ],
+                6.70 * 2,
+                74.68 * 2
+        ),
+        # OWN Test Case #3 - 1 Product
+        #   7.99 * 0.15 = 1,1985 -> ROUND(1,1985) -> 1.20 TAX
+        #       7.99 + TAX = 7.99 + 1.20 = 9.19 TOTAL
+        (
+                [
+                    {
+                        "product_name": "pencil",
+                        "product_quantity": 1,
+                        "product_price": 7.99,
+                        "product_basic_tax": 10,
+                        "product_import_state": True
+                    }
+                ],
+                1.20,
+                9.19
+        ),
+        # OWN Test Case #4 - 1 Product with import tax only
+        #   7.99 * 0.05 = 0.3995 -> ROUND(0.3995) -> 0.40 TAX
+        #       7.99 + TAX = 7.99 + 0.40 = 8.39 TOTAL
+        (
+                [
+                    {
+                        "product_name": "bread",
+                        "product_quantity": 1,
+                        "product_price": 7.99,
+                        "product_basic_tax": 0,
+                        "product_import_state": True
+                    }
+                ],
+                0.40,
+                8.39
+        ),
+        # OWN Test Case #5 - 1 Product with 0 Tax
+        #   7.99 * 0.00 = 0.00 -> ROUND(0.00) -> 0.00 TAX
+        #       7.99 + TAX = 7.99 + 0.00 = 7.99 TOTAL
+        (
+                [
+                    {
+                        "product_name": "medkit",
+                        "product_quantity": 1,
+                        "product_price": 7.99,
+                        "product_basic_tax": 0,
+                        "product_import_state": False
+                    }
+                ],
+                0.0,
+                7.99
+        ),
+    ]
+)
+def test_calculate_total(create_dummy_tax_ui_object, products, expected_sales_tax, expected_total):
+    tax_controller = controller.TaxController(create_dummy_tax_ui_object)
+    for product in products:
+        tax_controller.add_product(product_information=product)
+    receipt_information: dict = tax_controller.calculate_total()
+    assert receipt_information['receipt_total']['sales_tax'] == expected_sales_tax
+    assert receipt_information['receipt_total']['total'] == expected_total
+
+
+###
+# reset_calculation()
+###
+def test_reset_calculation(create_dummy_tax_ui_object):
+    dummy_product: dict = {
+        "product_name": "book",
+        "product_quantity": 1,
+        "product_price": 14.99,
+        "product_basic_tax": 10,
+        "product_import_state": False
+    }
+    tax_controller = controller.TaxController(create_dummy_tax_ui_object)
+    tax_controller.add_product(product_information=dummy_product)
+    # get list of products
+    # check if the list is not empty
+    assert tax_controller.taxProducts != []
+    tax_controller.reset_calculation()
+    # check if the list is empty
+    assert tax_controller.taxProducts == []
