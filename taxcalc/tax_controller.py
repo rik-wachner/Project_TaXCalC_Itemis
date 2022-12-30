@@ -216,6 +216,16 @@ class TaxController:
 
         tax = n*p/100; for a tax rate of n% and a price of p
 
+        Additionally, the product information given by the model's method will be used with the following structure:
+
+        product_information: dict = {
+            "product_name": <the product name>,
+            "product_quantity": <the product quantity>,
+            "product_price": <the product price>,
+            "product_basic_tax": <the product basic tax rate>,
+            "product_import_state": <the product import state>
+        }
+
         :return:
         :rtype: dict
         """
@@ -223,28 +233,27 @@ class TaxController:
         total_sales_tax = 0.0
         total = 0.0
         for index, product in enumerate(self.taxProducts):
-            product_name = getattr(product, "name")
-            product_price = getattr(product, "price")
-            product_quantity = getattr(product, "quantity")
-            basic_tax = getattr(product, 'basic_tax')
-            import_state = getattr(product, 'import_sate')
-            tax = basic_tax + (5 if import_state else 0)
+            product_information = product.get_product_information()
+            tax = product_information["product_basic_tax"] + (5 if product_information["product_import_state"] else 0)
             # The rounding rules for sales tax are that for a tax
             # rate of n%, a shelf price of p contains (np/100 rounded up to the nearest 0.05) amount of
             # sales tax.
-            product_tax = tax * product_price / 100
+            product_tax = tax * product_information["product_price"] / 100
             rounded_tax_value = self._round_tax(tax_number=product_tax, solution_calc_engine="rik")
-            product_taxed_price = round(((product_price + rounded_tax_value) * product_quantity), 2)
+            product_taxed_price = round(
+                ((product_information["product_price"] + rounded_tax_value) * product_information["product_quantity"]),
+                2
+            )
             # print("TAX RATE:", tax)
             # print(f"TAX FEE: {product_tax} -> {rounded_tax_value}")
             # print(f"PRODUCT PRICE: {product_price} -> {product_tax_price}")
-            total_sales_tax += rounded_tax_value * product_quantity
+            total_sales_tax += rounded_tax_value * product_information["product_quantity"]
             total += product_taxed_price
             # Add product to dict for ui data transfer
             product_calculation_info[index] = {
-                "product_name": product_name,
-                "import_state": import_state,
-                "quantity": product_quantity,
+                "product_name": product_information["product_name"],
+                "import_state": product_information["product_import_state"],
+                "quantity": product_information["product_quantity"],
                 "taxed_price": product_taxed_price
             }
         receipt_calculation = {
