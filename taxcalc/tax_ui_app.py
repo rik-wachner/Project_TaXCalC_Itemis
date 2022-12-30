@@ -159,6 +159,18 @@ class TaxUIApp(customtkinter.CTk):
         )
         self.show_receipt_button.grid(row=1, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
+        # create segmented button for loading examples in
+        self.load_example_button = customtkinter.CTkSegmentedButton(
+            master=self,
+            values=[
+                self.product_lan_inf['examples']['example_1'],
+                self.product_lan_inf['examples']['example_2'],
+                self.product_lan_inf['examples']['example_3']
+            ],
+            command=self.load_example_click
+        )
+        self.load_example_button.grid(row=2, column=0, columnspan=4, padx=(20, 20), pady=(0, 20), sticky="nsew")
+
     @staticmethod
     def getProductLanguageInformation(language: str) -> dict:
         language_packs = {
@@ -304,6 +316,32 @@ class TaxUIApp(customtkinter.CTk):
 
     def show_receipt_click(self):
         self.connected_controller.calculate_receipt()
+
+    def load_example_click(self, value):
+        self.connected_controller.reset_calculation()
+        load_products: list = []
+        if value == self.product_lan_inf['examples']['example_1']:
+            load_products.append(["book", 1, 12.49, 0, False])
+            load_products.append(["music CD", 1, 14.99, 10, False])
+            load_products.append(["chocolate bar", 1, 0.85, 0, False])
+        elif value == self.product_lan_inf['examples']['example_2']:
+            load_products.append(["box of chocolates", 1, 10.00, 0, True])
+            load_products.append(["bottle of perfume", 1, 47.50, 10, True])
+        elif value == self.product_lan_inf['examples']['example_3']:
+            load_products.append(["box of perfume", 1, 27.99, 10, True])
+            load_products.append(["bottle of perfume", 1, 18.99, 10, False])
+            load_products.append(["headache pills", 1, 9.75, 0, False])
+            load_products.append(["chocolates", 1, 11.25, 0, True])
+
+        for product in load_products:
+            self.add_new_product(
+                product_name=product[0],
+                product_quantity=product[1],
+                product_price=product[2],
+                product_basic_tax=product[3],
+                product_import_state=product[4]
+            )
+        self.load_example_button.set(None)
 
     def add_new_product(
             self,
