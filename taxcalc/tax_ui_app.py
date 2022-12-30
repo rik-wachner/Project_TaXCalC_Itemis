@@ -212,7 +212,15 @@ class TaxUIApp(customtkinter.CTk):
                     "accept": "Close Receipt"
                 },
                 "error_handling": {
-                    "e001": "X",
+                    "TAX-e000": "Unknown / Undefined error occur",
+                    "TAX-e001": "The product name, quantity or price cannot be empty!" + "\n"
+                                "Please add some information for the calculation",
+                    "TAX-e002": "The product name is to long. Name the product with max 50 characters",
+                    "TAX-e003": "The product quantity cannot be zero (0) or negative (-1, -2, ...) for the calculation",
+                    "TAX-e004": "The product quantity cannot be greater then ninety-nine (> 99) for the calculation",
+                    "TAX-e005": "The product price cannot be zero (0) or negative (-1, -2, ...) for the calculation",
+                    "PY-e001": "Check the types of your input!" + "\n"
+                               "The quantity or price should be numeric with '.' as decimal point",
                     "accept": "OK"
                 },
                 "misc": {
@@ -257,7 +265,15 @@ class TaxUIApp(customtkinter.CTk):
                     "accept": "Quittung schließen"
                 },
                 "error_handling": {
-                    "e001": "X",
+                    "TAX-e000": "Unbekannter Fehler ist aufgetreten",
+                    "TAX-e001": "Der Produktname, die Menge oder der Preis dürfen nicht leer sein!" + "\n"
+                                "Bitte fuegen Sie die fehlenden Informationen für die Berechnung hinzu",
+                    "TAX-e002": "Der Produktname ist zu lang. Benennen Sie das Produkt mit maximal 50 Zeichen",
+                    "TAX-e003": "Die Produktmenge darf bei der Berechnung nicht 0 oder negativ (-1, -2, ...) sein",
+                    "TAX-e004": "Die Produktmenge kann bei der Berechnung nicht größer als 99 sein",
+                    "TAX-e005": "Der Produktpreis kann bei der Berechnung nicht 0 oder negativ (-1, -2, ...) sein.",
+                    "PY-e001": "Überprüfen Sie die Art Ihrer Eingabe!" + "\n"
+                               "Die Menge oder der Preis sollte numerisch sein mit '.' als Dezimalkomma",
                     "accept": "OK"
                 },
                 "misc": {
@@ -427,8 +443,12 @@ class TaxUIApp(customtkinter.CTk):
         )
         self.__clear_input_fields()
 
-    def error_handling(self, message: str):
-        self.__show_error_popup_message(message)
+    def error_handling(self, error_code: str, alternative_message: str):
+        error_message = self.product_lan_inf['error_handling'].get(error_code)
+        if error_message:
+            self.__show_error_popup_message(message=error_message)
+        else:
+            self.__show_error_popup_message(message=alternative_message)
 
     def show_receipt(self, receipt_details: dict):
         message_str = ""

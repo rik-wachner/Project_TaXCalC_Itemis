@@ -33,11 +33,11 @@ class TaxController:
             """
             Check if the product information content contains missing entries ("" or NULL) in the following structure:
             :return: None or raised TaxBaseError exception
-            :rtype: None or a TaxBaseError exception object
+            :rtype: None or a TaxBaseError exception object with error code == 'TAX-e001'
             """
             product_information_values = product_information.values()
             if None in product_information_values or "" in product_information_values:
-                raise TaxBaseError("Input fields cannot be empty! Like the product name, quantity or price")
+                raise TaxBaseError("TAX-e001", "Input fields cannot be empty! Like the product name, quantity or price")
 
         def __check_product_name(product_name: str):
             """
@@ -45,10 +45,10 @@ class TaxController:
             :param product_name: Product name
             :type product_name: str
             :return: None or raised TaxBaseError exception
-            :rtype: None or a TaxBaseError exception object
+            :rtype: None or a TaxBaseError exception object with error code == 'TAX-e002'
             """
             if len(product_name) > 50:
-                raise TaxBaseError("Product name is to long (max 50 characters)")
+                raise TaxBaseError("TAX-e002", "Product name is to long (max 50 characters)")
 
         def __check_product_quantity(product_quantity: int):
             """
@@ -56,13 +56,13 @@ class TaxController:
             :param product_quantity: Product quantity
             :type product_quantity: int
             :return: None or raised TaxBaseError exception
-            :rtype: None or a TaxBaseError exception object
+            :rtype: None or a TaxBaseError exception object with error code == 'TAX-e003' OR 'TAX-e004'
             """
             if product_quantity < 1:
-                raise TaxBaseError("Product quantity cannot be zero (0) or negative (-1, -2, ...)")
+                raise TaxBaseError("TAX-e003", "Product quantity cannot be zero (0) or negative (-1, -2, ...)")
 
             if product_quantity > 99:
-                raise TaxBaseError("Product quantity cannot be greater then ninety-nine (> 99)")
+                raise TaxBaseError("TAX-e004", "Product quantity cannot be greater then ninety-nine (> 99)")
 
         def __check_product_price(product_price: float):
             """
@@ -70,10 +70,10 @@ class TaxController:
             :param product_price: Product price
             :type product_price: float
             :return: None or raised TaxBaseError exception
-            :rtype: None or a TaxBaseError exception object
+            :rtype: None or a TaxBaseError exception object with error code == 'TAX-e005'
             """
             if product_price <= 0:
-                raise TaxBaseError("Product price cannot be zero (0) or negative (-1, -2, ...)")
+                raise TaxBaseError("TAX-e005", "Product price cannot be zero (0) or negative (-1, -2, ...)")
 
             # No ruling for a limit price range -> dangerous because of MAX_INTEGER values in the calculation
             # if product_price > ?:
@@ -197,10 +197,16 @@ class TaxController:
             # new_product.get_product_information() == product_information
             self.view.display_new_record(new_product.get_product_information())
         except TaxBaseError as tax_base_exception:
-            self.view.error_handling(message=str(tax_base_exception))
+            self.view.error_handling(
+                error_code=tax_base_exception.error_code,
+                alternative_message=str(tax_base_exception)
+            )
         # Inappropriate argument value (of correct type)
         except ValueError as buildin_value_error:
-            self.view.error_handling(message=str(buildin_value_error))
+            self.view.error_handling(
+                error_code="PY-e001",
+                alternative_message=str(buildin_value_error)
+            )
 
     def calculate_receipt(self):
         receipt = self.calculate_total()
