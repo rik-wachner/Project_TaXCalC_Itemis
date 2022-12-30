@@ -1,9 +1,8 @@
 # test of tax_controller.py
 import pytest
+from unittest.mock import MagicMock
 # Unit / Component testing of the tax_controller python script
 import taxcalc.tax_controller as controller
-import taxcalc.tax_ui_app as ui  # @TODO Mock the ui!
-import taxcalc.tax_product as model
 import taxcalc.tax_error_handling as error_handling
 
 
@@ -13,14 +12,13 @@ import taxcalc.tax_error_handling as error_handling
 
 @pytest.fixture(scope="module")
 def create_dummy_tax_ui_object(request):
-    return ui.TaxUIApp(width=780, height=590, language_code="eng")
+    return MagicMock()
+    #return ui.TaxUIApp(width=780, height=590, language_code="eng")
 
 
 ##############
 # Test Cases #
 ##############
-
-# @TODO
 
 ###
 # __check_product_information()
@@ -231,6 +229,13 @@ def test_add_product_with_missing_entry(create_dummy_tax_ui_object, product_info
     # Test that products with missing information will not be added
     assert tax_controller.taxProducts == []
     # assert exc_info.type == error_handling.TaxBaseError
+
+
+###
+# calculate_receipt()
+###
+def test_calculate_receipt(create_dummy_tax_ui_object):
+    pass
 
 
 ###
