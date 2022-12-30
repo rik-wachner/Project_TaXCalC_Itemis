@@ -13,9 +13,13 @@ class TaxUIApp(customtkinter.CTk):
 
         self.width = width
         self.height = height
-        # self.language_code = language_code @TODO Add language support later
+        self.language_code = language_code
+
         # set connected controller to None in init
         self.connected_controller = None
+
+        # Load language pack
+        self.product_lan_inf = TaxUIApp.getProductLanguageInformation(self.language_code)
 
         def __set_treeview_columns(treeview: tkinter.ttk.Treeview, column_names: dict):
             column_names_keys = column_names.keys()
@@ -32,7 +36,7 @@ class TaxUIApp(customtkinter.CTk):
                 treeview.column(key, anchor="w", width=120)
 
         # configure window
-        self.title("TaXCalC")
+        self.title(self.product_lan_inf["app_title"])
         self.geometry(f"{self.width}x{self.height}")
         self.resizable(False, False)
 
@@ -45,17 +49,7 @@ class TaxUIApp(customtkinter.CTk):
         self.treeview = tkinter.ttk.Treeview(self, show="headings")
         self.treeview.grid(row=0, column=0, columnspan=4, padx=(20, 20), pady=(20, 0), sticky="nsew")
         # Set the Table columns to the TaxProduct language
-        __set_treeview_columns(
-            self.treeview,
-            {
-                # "product_id": "ID",
-                "product_name": "Product",
-                "product_quantity": "Quantity (Unit)",
-                "product_price": "Price ($)",
-                "product_basic_tax": "Tax (%)",
-                "product_import_state": "Imported",
-            }
-        )
+        __set_treeview_columns(self.treeview, self.product_lan_inf["table_headline"])
 
         # create checkbox and switch frame
         self.tax_input_frame = customtkinter.CTkFrame(self)
@@ -68,7 +62,7 @@ class TaxUIApp(customtkinter.CTk):
         #   -> label
         self.product_name_label = customtkinter.CTkLabel(
             self.tax_input_frame,
-            text="Product Name:",
+            text=f"{self.product_lan_inf['product_input_fields']['product_name_label']}:",
             font=customtkinter.CTkFont(size=12)
         )
         self.product_name_label.grid(row=0, column=0, padx=10, pady=10)
@@ -76,42 +70,42 @@ class TaxUIApp(customtkinter.CTk):
         #   -> input field
         self.product_name = customtkinter.CTkEntry(
             self.tax_input_frame,
-            placeholder_text="Enter product name..."
+            placeholder_text=self.product_lan_inf['product_input_fields']['product_name_input_label']
         )
         self.product_name.grid(row=0, column=1, padx=(10, 20), pady=10, columnspan=2, sticky="nsew")
         # Product Quantity
         #   -> label
         self.product_quantity_label = customtkinter.CTkLabel(
             self.tax_input_frame,
-            text="Quantity:",
+            text=f"{self.product_lan_inf['product_input_fields']['product_quantity_label']}:",
             font=customtkinter.CTkFont(size=12)
         )
         self.product_quantity_label.grid(row=1, column=0, padx=10, pady=10)
         #   -> input field
         self.product_quantity = customtkinter.CTkEntry(
             self.tax_input_frame,
-            placeholder_text="Enter product quantity..."
+            placeholder_text=self.product_lan_inf['product_input_fields']['product_quantity_input_label']
         )
         self.product_quantity.grid(row=1, column=1, padx=(10, 20), pady=10, columnspan=2, sticky="nsew")
         # Product Price
         #   -> label
         self.product_price_label = customtkinter.CTkLabel(
             self.tax_input_frame,
-            text="Price:",
+            text=f"{self.product_lan_inf['product_input_fields']['product_price_label']}:",
             font=customtkinter.CTkFont(size=12)
         )
         self.product_price_label.grid(row=2, column=0, padx=10, pady=10)
         #   -> input field
         self.product_price = customtkinter.CTkEntry(
             self.tax_input_frame,
-            placeholder_text="Enter product price..."
+            placeholder_text=self.product_lan_inf['product_input_fields']['product_price_input_label']
         )
         self.product_price.grid(row=2, column=1, padx=(10, 20), pady=10, columnspan=2, sticky="nsew")
         # Product Tax -> Tax Rate
         #   -> label
         self.basic_tax_label = customtkinter.CTkLabel(
             self.tax_input_frame,
-            text="Basic sales tax",
+            text=f"{self.product_lan_inf['product_input_fields']['product_basic_tax_label']}:",
             font=customtkinter.CTkFont(size=12)
         )
         self.basic_tax_label.grid(row=3, column=0, padx=10, pady=10)
@@ -121,21 +115,21 @@ class TaxUIApp(customtkinter.CTk):
             dynamic_resizing=True,
             # > First Option: 0%
             # > Second Option: 10%
-            values=["0%", "10%"]
+            values=self.product_lan_inf['product_input_fields']['product_basic_tax_input_labels']
         )
         self.basic_tax.grid(row=3, column=1, padx=10, pady=10, sticky="nsew")
         # Product Tax -> Import Tax Rate
         #   -> label + input field
         self.import_checkbox = customtkinter.CTkCheckBox(
             master=self.tax_input_frame,
-            text="Imported"
+            text=self.product_lan_inf['product_input_fields']['product_import_checkbox_label']
         )
         self.import_checkbox.grid(row=3, column=2, padx=10, pady=10, sticky="nsew")
         # Create and place 'Add Product' button
         self.add_product_button = customtkinter.CTkButton(
             master=self.tax_input_frame,
             font=customtkinter.CTkFont(size=13, weight="bold"),
-            text="Add product",
+            text=self.product_lan_inf['buttons']['add_product'],
             command=self.add_product_click
         )
         self.add_product_button.grid(row=4, column=0, padx=(10, 10), pady=(10, 10), columnspan=3, sticky="nsew")
@@ -150,7 +144,7 @@ class TaxUIApp(customtkinter.CTk):
             font=customtkinter.CTkFont(size=13, weight="bold"),
             fg_color="#CC0000",
             hover_color="#990000",
-            text="Reset calculation",
+            text=self.product_lan_inf['buttons']['reset_calculation'],
             command=self.reset_calculation_click
         )
         self.reset_calculation_button.grid(row=0, column=0, padx=(10, 10), pady=(10, 0), sticky="nsew")
@@ -160,10 +154,106 @@ class TaxUIApp(customtkinter.CTk):
             font=customtkinter.CTkFont(size=13, weight="bold"),
             fg_color="#00B300",
             hover_color="#006700",
-            text="Show receipt",
+            text=self.product_lan_inf['buttons']['show_receipt'],
             command=self.show_receipt_click,
         )
         self.show_receipt_button.grid(row=1, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
+
+    @staticmethod
+    def getProductLanguageInformation(language: str) -> dict:
+        language_packs = {
+            "eng": {
+                "app_title": "TaXCalC",
+                "table_headline": {
+                    # "product_id": "ID",
+                    "product_name": "Product",
+                    "product_quantity": "Quantity (Unit)",
+                    "product_price": "Price ($)",
+                    "product_basic_tax": "Tax (%)",
+                    "product_import_state": "Imported",
+                },
+                "product_input_fields": {
+                    "product_name_label": "Product Name",
+                    "product_name_input_label": "Enter product name ...",
+                    "product_quantity_label": "Quantity",
+                    "product_quantity_input_label": "Enter product quantity ...",
+                    "product_price_label": "Price",
+                    "product_price_input_label": "Enter product price ...",
+                    "product_basic_tax_label": "Tax Rate",
+                    "product_basic_tax_input_labels": ["Tax Free (0 %)", "Basic Sales Tax (10 %)"],
+                    "product_import_checkbox_label": "Imported",
+                },
+                "buttons": {
+                    "add_product": "Add Product",
+                    "reset_calculation": "Reset Calculation",
+                    "show_receipt": "Show Receipt"
+                },
+                "examples": {
+                    "example_1": "Load Example 1",
+                    "example_2": "Load Example 2",
+                    "example_3": "Load Example 3"
+                },
+                "receipt": {
+                    "imported": "imported",
+                    "sales_taxes": "Sales Taxes",
+                    "total": "Total",
+                    "accept": "Close Receipt"
+                },
+                "error_handling": {
+                    "e001": "X",
+                    "accept": "OK"
+                },
+                "misc": {
+                    "product_import_state_choice": ["YES", "NO"]
+                }
+            },
+            "de": {
+                "app_title": "TaXCalC",
+                "table_headline": {
+                    # "product_id": "ID",
+                    "product_name": "Produkt",
+                    "product_quantity": "Menge (Stk.)",
+                    "product_price": "Preis ($)",
+                    "product_basic_tax": "Steuer (%)",
+                    "product_import_state": "Eingefuehrt",
+                },
+                "product_input_fields": {
+                    "product_name_label": "Produktname",
+                    "product_name_input_label": "Produktnamen eingeben ...",
+                    "product_quantity_label": "Menge",
+                    "product_quantity_input_label": "Produktmenge eingeben ...",
+                    "product_price_label": "Preis",
+                    "product_price_input_label": "Produktpreis eingeben ...",
+                    "product_basic_tax_label": "Steuersatz",
+                    "product_basic_tax_input_labels": ["Steuerfrei (0 %)", "Grundumsatzsteuer (10 %)"],
+                    "product_import_checkbox_label": "Eingefuehrt",
+                },
+                "buttons": {
+                    "add_product": "Produkt hinzufügen",
+                    "reset_calculation": "Berechnung zurücksetzen",
+                    "show_receipt": "Quittung anzeigen"
+                },
+                "examples": {
+                    "example_1": "Lade Beispiel 1",
+                    "example_2": "Lade Beispiel 2",
+                    "example_3": "Lade Beispiel 3"
+                },
+                "receipt": {
+                    "imported": "importierte(s)",
+                    "sales_taxes": "Umsatzsteuer",
+                    "total": "Gesamt",
+                    "accept": "Quittung schließen"
+                },
+                "error_handling": {
+                    "e001": "X",
+                    "accept": "OK"
+                },
+                "misc": {
+                    "product_import_state_choice": ["JA", "NEIN"]
+                }
+            }
+        }
+        return language_packs.get(language, "Invalid Language Code")
 
     def __clear_input_fields(self):
         """
@@ -194,10 +284,12 @@ class TaxUIApp(customtkinter.CTk):
         :rtype: None
         """
         chosen_basic_tax_option = self.basic_tax.get()
-        basic_tax = 0
-        # position_of_tax_translation = tax_translation.index(chosen_basic_tax_option)
-        if chosen_basic_tax_option == "10%":
-            basic_tax = 10
+        # Position Map Ruling
+        # > POS 0 == First Option: 0%
+        # > POS 1 == Second Option: 10%
+        tax_translation = self.product_lan_inf['product_input_fields']['product_basic_tax_input_labels']
+        position_of_tax_translation = tax_translation.index(chosen_basic_tax_option)
+        basic_tax = 0 if position_of_tax_translation == 0 else 10
         self.add_new_product(
             product_name=self.product_name.get(),
             product_quantity=self.product_quantity.get(),
@@ -277,7 +369,10 @@ class TaxUIApp(customtkinter.CTk):
         """
         # Visual Change
         #   > For the UI, change 'True' / 'False' to 'YES' / 'NO' (eng version)
-        product_import_state_word = "YES" if product_information["product_import_state"] else "NO"
+        import_state_translation = self.product_lan_inf['misc']['product_import_state_choice']
+        product_import_state_word = import_state_translation[0] \
+            if product_information["product_import_state"] \
+            else import_state_translation[1]
 
         # Add the new record to the treeview widget in the ui
         self.treeview.insert(
@@ -303,19 +398,18 @@ class TaxUIApp(customtkinter.CTk):
         product_details = receipt_details["products"]
         for product in product_details:
             import_statement = (
-                    "imported" + " "
+                    self.product_lan_inf['receipt']['imported'] + " "
             ) if product_details[product]['import_state'] else ""
-            message_str += \
-                f"{product_details[product]['quantity']}" + \
-                " " \
-                f"{import_statement} {product_details[product]['product_name']}:" + \
-                " " \
-                f"{product_details[product]['taxed_price']}" + \
-                "\n"
+            message_str += f"{product_details[product]['quantity']}" +\
+                           " " \
+                           f"{import_statement} {product_details[product]['product_name']}:" +\
+                           " " \
+                           f"{product_details[product]['taxed_price']}" \
+                           + "\n"
         # Add sales tex to string
-        message_str += f"Sales Tax: {receipt_total_details['sales_tax']}" + "\n"
+        message_str += f"{self.product_lan_inf['receipt']['sales_taxes']}: {receipt_total_details['sales_tax']}" + "\n"
         # Add total amount to string
-        message_str += f"Total: {receipt_total_details['total']}"
+        message_str += f"{self.product_lan_inf['receipt']['total']}: {receipt_total_details['total']}"
         self.__show_receipt_popup_message(message=message_str)
 
     def __show_error_popup_message(self, message: str):
@@ -323,7 +417,7 @@ class TaxUIApp(customtkinter.CTk):
         popup_window = customtkinter.CTkToplevel(self)
         popup_window.geometry("500x150")
         popup_window.resizable(False, False)
-        popup_window.title("TaXCalC")
+        popup_window.title(self.product_lan_inf["app_title"])
         popup_window.grab_set()
 
         # create label on CTkToplevel window
@@ -332,7 +426,7 @@ class TaxUIApp(customtkinter.CTk):
         accept_button = customtkinter.CTkButton(
             master=popup_window,
             font=customtkinter.CTkFont(size=13, weight="bold"),
-            text="OK",
+            text=self.product_lan_inf['error_handling']['accept'],
             command=popup_window.destroy
         )
         accept_button.pack(padx=20, pady=20)
@@ -342,7 +436,7 @@ class TaxUIApp(customtkinter.CTk):
         popup_window = customtkinter.CTkToplevel(self)
         popup_window.geometry("700x350")
         popup_window.resizable(False, False)
-        popup_window.title("TaXCalC")
+        popup_window.title(self.product_lan_inf["app_title"])
         popup_window.grab_set()
 
         # create textbox on CTkToplevel window
@@ -357,7 +451,7 @@ class TaxUIApp(customtkinter.CTk):
         accept_button = customtkinter.CTkButton(
             master=popup_window,
             font=customtkinter.CTkFont(size=13, weight="bold"),
-            text="OK",
+            text=self.product_lan_inf['receipt']['accept'],
             command=popup_window.destroy
         )
         accept_button.pack(padx=20, pady=(10, 20))
