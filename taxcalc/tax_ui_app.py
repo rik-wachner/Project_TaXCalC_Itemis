@@ -249,8 +249,8 @@ class TaxUIApp(customtkinter.CTk):
                     "product_import_checkbox_label": "Eingefuehrt",
                 },
                 "buttons": {
-                    "add_product": "Produkt hinzufügen",
-                    "reset_calculation": "Berechnung zurücksetzen",
+                    "add_product": "Produkt hinzufuegen",
+                    "reset_calculation": "Berechnung zuruecksetzen",
                     "show_receipt": "Quittung anzeigen"
                 },
                 "examples": {
@@ -262,17 +262,17 @@ class TaxUIApp(customtkinter.CTk):
                     "imported": "importierte(s)",
                     "sales_taxes": "Umsatzsteuer",
                     "total": "Gesamt",
-                    "accept": "Quittung schließen"
+                    "accept": "Quittung schliessen"
                 },
                 "error_handling": {
                     "TAX-e000": "Unbekannter Fehler ist aufgetreten",
-                    "TAX-e001": "Der Produktname, die Menge oder der Preis dürfen nicht leer sein!" + "\n"
-                                "Bitte fuegen Sie die fehlenden Informationen für die Berechnung hinzu",
+                    "TAX-e001": "Der Produktname, die Menge oder der Preis duerfen nicht leer sein!" + "\n"
+                                "Bitte fuegen Sie die fehlenden Informationen fuer die Berechnung hinzu",
                     "TAX-e002": "Der Produktname ist zu lang. Benennen Sie das Produkt mit maximal 50 Zeichen",
                     "TAX-e003": "Die Produktmenge darf bei der Berechnung nicht 0 oder negativ (-1, -2, ...) sein",
-                    "TAX-e004": "Die Produktmenge kann bei der Berechnung nicht größer als 99 sein",
+                    "TAX-e004": "Die Produktmenge kann bei der Berechnung nicht groesser als 99 sein",
                     "TAX-e005": "Der Produktpreis kann bei der Berechnung nicht 0 oder negativ (-1, -2, ...) sein.",
-                    "PY-e001": "Überprüfen Sie die Art Ihrer Eingabe!" + "\n"
+                    "PY-e001": "Ueberpruefen Sie die Art Ihrer Eingabe!" + "\n"
                                "Die Menge oder der Preis sollte numerisch sein mit '.' als Dezimalkomma",
                     "accept": "OK"
                 },
