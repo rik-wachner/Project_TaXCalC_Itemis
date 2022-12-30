@@ -8,7 +8,19 @@ customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-bl
 
 
 class TaxUIApp(customtkinter.CTk):
+    """
+    Class representing the customtkinter-based UI
+    """
     def __init__(self, width: int, height: int, language_code: str):
+        """
+        Initialize a TaxUIApp object
+        :param width: width of the main window
+        :type width: int
+        :param height: height of the main window
+        :type height: int
+        :param language_code: ISO 639 language code for the UI content translation
+        :type language_code: str
+        """
         super().__init__()
 
         self.width = width
@@ -19,15 +31,24 @@ class TaxUIApp(customtkinter.CTk):
         self.connected_controller = None
 
         # Load language pack
-        self.product_lan_inf = TaxUIApp.getProductLanguageInformation(self.language_code)
+        self.product_lan_inf = TaxUIApp.get_product_language_information(language_code=self.language_code)
 
         def __set_treeview_columns(treeview: tkinter.ttk.Treeview, column_names: dict):
+            """
+            Set the columns in the tkinter.ttk.Treeview object
+            :param treeview: Target tkinter.ttk.Treeview object to change the columns
+            :type treeview: tkinter.ttk.Treeview
+            :param column_names: Names of the columns to set to
+            :type column_names: dict
+            :return: None
+            :rtype: None
+            """
             column_names_keys = column_names.keys()
-            # Using tuple() for unpacking dictionary keys into tuple
+            # Using tuple() for unpacking dictionary keys into a tuple
             treeview['columns'] = tuple(column_names_keys)  # var refs
             # ("product_name", "product_quantity", "product_price", "product_import_state")
 
-            # Formate / "remove" the treeview index columns
+            # Format / "remove" the tkinter.ttk.Treeview index columns
             treeview.column("#0", width=0, stretch="no")
 
             # Formatting the Heading and the Column for each name
@@ -46,10 +67,10 @@ class TaxUIApp(customtkinter.CTk):
         self.grid_rowconfigure((0, 1), weight=1)
 
         # Receipt input field
-        self.treeview = tkinter.ttk.Treeview(self, show="headings")
-        self.treeview.grid(row=0, column=0, columnspan=4, padx=(20, 20), pady=(20, 0), sticky="nsew")
+        self.product_list = tkinter.ttk.Treeview(self, show="headings")
+        self.product_list.grid(row=0, column=0, columnspan=4, padx=(20, 20), pady=(20, 0), sticky="nsew")
         # Set the Table columns to the TaxProduct language
-        __set_treeview_columns(self.treeview, self.product_lan_inf["table_headline"])
+        __set_treeview_columns(self.product_list, self.product_lan_inf["table_headline"])
 
         # create checkbox and switch frame
         self.tax_input_frame = customtkinter.CTkFrame(self)
@@ -130,7 +151,7 @@ class TaxUIApp(customtkinter.CTk):
             master=self.tax_input_frame,
             font=customtkinter.CTkFont(size=13, weight="bold"),
             text=self.product_lan_inf['buttons']['add_product'],
-            command=self.add_product_click
+            command=self.__add_product_click
         )
         self.add_product_button.grid(row=4, column=0, padx=(10, 10), pady=(10, 10), columnspan=3, sticky="nsew")
 
@@ -159,7 +180,7 @@ class TaxUIApp(customtkinter.CTk):
         )
         self.show_receipt_button.grid(row=1, column=0, padx=(10, 10), pady=(10, 10), sticky="nsew")
 
-        # create segmented button for loading examples in
+        # Create segmented button to load examples in
         self.load_example_button = customtkinter.CTkSegmentedButton(
             master=self,
             values=[
@@ -171,8 +192,19 @@ class TaxUIApp(customtkinter.CTk):
         )
         self.load_example_button.grid(row=2, column=0, columnspan=4, padx=(20, 20), pady=(0, 20), sticky="nsew")
 
+    ##################
+    # Static Methods #
+    ##################
+
     @staticmethod
-    def getProductLanguageInformation(language: str) -> dict:
+    def get_product_language_information(language_code: str) -> dict:
+        """
+        Return the language pack for the UI by the matching language_code
+        :param language_code: ISO 639 language code
+        :type language_code: str
+        :return: Language pack for the UI
+        :rtype: dict
+        """
         language_packs = {
             "eng": {
                 "app_title": "TaXCalC",
@@ -281,65 +313,19 @@ class TaxUIApp(customtkinter.CTk):
                 }
             }
         }
-        return language_packs.get(language, "Invalid Language Code")
+        return language_packs.get(language_code, "Invalid Language Code")
 
-    def __clear_input_fields(self):
+    ###################
+    # Private Methods #
+    ###################
+
+    ###
+    # > Methods for Buttons and other action-based UI elements
+    ###
+
+    def __add_product_click(self):
         """
-        For a better usability, the function clears all used input fields
-        :return: None
-        :rtype: None
-        """
-        self.product_name.delete(0, "end")
-        self.product_quantity.delete(0, "end")
-        self.product_price.delete(0, "end")
-        self.import_checkbox.deselect()
-
-    def __reset_calculation_click(self):
-        self.connected_controller.reset_calculation()
-
-    def __show_receipt_click(self):
-        self.connected_controller.calculate_receipt()
-
-    def __load_example_click(self, value):
-        self.connected_controller.reset_calculation()
-        load_products: list = []
-        if value == self.product_lan_inf['examples']['example_1']:
-            load_products.append(["book", 1, 12.49, 0, False])
-            load_products.append(["music CD", 1, 14.99, 10, False])
-            load_products.append(["chocolate bar", 1, 0.85, 0, False])
-        elif value == self.product_lan_inf['examples']['example_2']:
-            load_products.append(["box of chocolates", 1, 10.00, 0, True])
-            load_products.append(["bottle of perfume", 1, 47.50, 10, True])
-        elif value == self.product_lan_inf['examples']['example_3']:
-            load_products.append(["box of perfume", 1, 27.99, 10, True])
-            load_products.append(["bottle of perfume", 1, 18.99, 10, False])
-            load_products.append(["headache pills", 1, 9.75, 0, False])
-            load_products.append(["chocolates", 1, 11.25, 0, True])
-
-        for product in load_products:
-            self.add_new_product(
-                product_name=product[0],
-                product_quantity=product[1],
-                product_price=product[2],
-                product_basic_tax=product[3],
-                product_import_state=product[4]
-            )
-        self.load_example_button.set(None)
-
-    def add_controller_listener(self, controller: TaxController):
-        """
-        Register a controller to be able to pass click events and information
-        :param controller: Controller for managing the data transfer between ui and data
-        :type controller: TaxController
-        :return: None
-        :rtype: None
-        """
-        self.connected_controller = controller
-
-    def add_product_click(self):
-        """
-        Function gets called after the 'Add Product' button were pressed
-        and adds a new product with the information in the input fields
+        Button-click-related method to add a new product with the information given in the input fields
         :return: None
         :rtype: None
         """
@@ -357,120 +343,84 @@ class TaxUIApp(customtkinter.CTk):
             product_basic_tax=basic_tax,
             product_import_state=bool(self.import_checkbox.get())
         )
-        self.__clear_input_fields()
 
-    def add_new_product(
-            self,
-            product_name: str,
-            product_quantity: int,
-            product_price: float,
-            product_basic_tax: int,
-            product_import_state: bool
-    ):
+    def __reset_calculation_click(self):
         """
-        Calls the tax controller to add a product with the given information
-        :param product_name: Product name
-        :type product_name: str
-        :param product_quantity: Quantity of that product
-        :type product_quantity: int
-        :param product_price: Price of that product
-        :type product_price: float
-        :param product_basic_tax: The chosen basic tax rate (either 0 or 10)
-        :type product_basic_tax: int
-        :param product_import_state: Indicates if the product were imported and need the 5% import duty
-        :type product_import_state: bool
+        Button-click-related method to reset the calculation
         :return: None
         :rtype: None
         """
-        product_information: dict = {
-            "product_name": product_name,
-            "product_quantity": product_quantity,
-            "product_price": product_price,
-            "product_basic_tax": product_basic_tax,
-            "product_import_state": product_import_state
-        }
-        self.connected_controller.add_product(product_information)
+        self.connected_controller.reset_calculation()
 
-    def reset_calculation(self):
+    def __show_receipt_click(self):
         """
-        Delete each element in the treeview and clear the ui input fields as a reset
+        Button-click-related method to show the receipt to the user
         :return: None
         :rtype: None
         """
-        # List of all elements in the tree view
-        for record in self.treeview.get_children():
-            self.treeview.delete(record)
-        self.__clear_input_fields()
+        self.connected_controller.calculate_receipt()
 
-    def display_new_record(self, product_information: dict):
+    def __load_example_click(self, value: str):
         """
-        Add the new product record to the treeview table
-
-        The information of the product has the following structure:
-
-        product_information: dict = {
-            "product_name": <the product name>,
-            "product_quantity": <the product quantity>,
-            "product_price": <the product price>,
-            "product_basic_tax": <the product basic tax rate>,
-            "product_import_state": <the product import state>
-        }
-
-        :param product_information: Map with the required product information to create a new TaxProduct object
-        :type product_information: dict
+        Button-click-related method to load a example set of products
+        :param value: Chosen example set
+        :type value: str
         :return: None
         :rtype: None
         """
-        # Visual Change
-        #   > For the UI, change 'True' / 'False' to 'YES' / 'NO' (eng version)
-        import_state_translation = self.product_lan_inf['misc']['product_import_state_choice']
-        product_import_state_word = import_state_translation[0] \
-            if product_information["product_import_state"] \
-            else import_state_translation[1]
-
-        # Add the new record to the treeview widget in the ui
-        self.treeview.insert(
-            parent='',
-            index='end',
-            text='',
-            values=(
-                product_information["product_name"],
-                product_information["product_quantity"],
-                product_information["product_price"],
-                product_information["product_basic_tax"],
-                product_import_state_word
+        # Overwrite the current calculation with the example
+        self.connected_controller.reset_calculation()
+        load_products: list = []
+        if value == self.product_lan_inf['examples']['example_1']:
+            load_products.append(["book", 1, 12.49, 0, False])
+            load_products.append(["music CD", 1, 14.99, 10, False])
+            load_products.append(["chocolate bar", 1, 0.85, 0, False])
+        elif value == self.product_lan_inf['examples']['example_2']:
+            load_products.append(["box of chocolates", 1, 10.00, 0, True])
+            load_products.append(["bottle of perfume", 1, 47.50, 10, True])
+        elif value == self.product_lan_inf['examples']['example_3']:
+            load_products.append(["box of perfume", 1, 27.99, 10, True])
+            load_products.append(["bottle of perfume", 1, 18.99, 10, False])
+            load_products.append(["headache pills", 1, 9.75, 0, False])
+            load_products.append(["chocolates", 1, 11.25, 0, True])
+        # Use add_new_product() method for inserting the new example products
+        for product in load_products:
+            self.add_new_product(
+                product_name=product[0],
+                product_quantity=product[1],
+                product_price=product[2],
+                product_basic_tax=product[3],
+                product_import_state=product[4]
             )
-        )
-        self.__clear_input_fields()
+        self.load_example_button.set(None)
 
-    def error_handling(self, error_code: str, alternative_message: str):
-        error_message = self.product_lan_inf['error_handling'].get(error_code)
-        if error_message:
-            self.__show_error_popup_message(message=error_message)
-        else:
-            self.__show_error_popup_message(message=alternative_message)
+    ###
+    # > Helper methods
+    ###
 
-    def show_receipt(self, receipt_details: dict):
-        message_str = ""
-        receipt_total_details = receipt_details["receipt_total"]
-        product_details = receipt_details["products"]
-        for product in product_details:
-            import_statement = (
-                    self.product_lan_inf['receipt']['imported'] + " "
-            ) if product_details[product]['import_state'] else ""
-            message_str += f"{product_details[product]['quantity']}" +\
-                           " " \
-                           f"{import_statement} {product_details[product]['product_name']}:" +\
-                           " " \
-                           f"{product_details[product]['taxed_price']}" \
-                           + "\n"
-        # Add sales tex to string
-        message_str += f"{self.product_lan_inf['receipt']['sales_taxes']}: {receipt_total_details['sales_tax']}" + "\n"
-        # Add total amount to string
-        message_str += f"{self.product_lan_inf['receipt']['total']}: {receipt_total_details['total']}"
-        self.__show_receipt_popup_message(message=message_str)
+    def __clear_input_fields(self):
+        """
+        For a better usability, the function clears all used input fields
+        :return: None
+        :rtype: None
+        """
+        self.product_name.delete(0, "end")
+        self.product_quantity.delete(0, "end")
+        self.product_price.delete(0, "end")
+        self.import_checkbox.deselect()
+
+    ###
+    # > Popup window
+    ###
 
     def __show_error_popup_message(self, message: str):
+        """
+        Show a popup window with a error message in it
+        :param message: Message to display to the user
+        :type message: str
+        :return: None
+        :rtype: None
+        """
         # Create a new popup window
         popup_window = customtkinter.CTkToplevel(self)
         popup_window.geometry("500x150")
@@ -490,6 +440,13 @@ class TaxUIApp(customtkinter.CTk):
         accept_button.pack(padx=20, pady=20)
 
     def __show_receipt_popup_message(self, message: str):
+        """
+        Show popup window with a error message in it
+        :param message:
+        :type message:
+        :return:
+        :rtype:
+        """
         # Create a new popup window
         popup_window = customtkinter.CTkToplevel(self)
         popup_window.geometry("700x350")
@@ -513,3 +470,164 @@ class TaxUIApp(customtkinter.CTk):
             command=popup_window.destroy
         )
         accept_button.pack(padx=20, pady=(10, 20))
+
+    ##################
+    # Public Methods #
+    ##################
+
+    def add_controller_listener(self, controller: TaxController):
+        """
+        Register a controller TaxController object to be able to pass click events and information
+        :param controller: Controller for managing the data transfer between UI and data
+        :type controller: TaxController
+        :return: None
+        :rtype: None
+        """
+        self.connected_controller = controller
+
+    def add_new_product(
+            self,
+            product_name: str,
+            product_quantity: int,
+            product_price: float,
+            product_basic_tax: int,
+            product_import_state: bool
+    ):
+        """
+        Calls the controller to add a product with the given information
+        :param product_name: Name of the product to add
+        :type product_name: str
+        :param product_quantity: Quantity of the product to add
+        :type product_quantity: int
+        :param product_price: Price of the product to add
+        :type product_price: float
+        :param product_basic_tax: The chosen basic tax rate (either 0 or 10) of the product to add
+        :type product_basic_tax: int
+        :param product_import_state: Indication whether the product was imported (True) and therefore requires the 5% import duty
+        :type product_import_state: bool
+        :return: None
+        :rtype: None
+        """
+        product_information: dict = {
+            "product_name": product_name,
+            "product_quantity": product_quantity,
+            "product_price": product_price,
+            "product_basic_tax": product_basic_tax,
+            "product_import_state": product_import_state
+        }
+        self.connected_controller.add_product(product_information)
+
+    def reset_calculation(self):
+        """
+        Delete each element in the product_list treeview and clear the UI input fields as a reset
+        :return: None
+        :rtype: None
+        """
+        # List of all elements in the tree view
+        for record in self.product_list.get_children():
+            self.product_list.delete(record)
+        self.__clear_input_fields()
+
+    def display_new_record(self, product_information: dict):
+        """
+        Add the new product record to the product_list treeview table
+
+        The information of the product has the following structure:
+
+        product_information: dict = {
+            "product_name": <the product name>,
+            "product_quantity": <the product quantity>,
+            "product_price": <the product price>,
+            "product_basic_tax": <the product basic tax rate>,
+            "product_import_state": <the product import state>
+        }
+
+        :param product_information: Map with the required product information to create a new TaxProduct object
+        :type product_information: dict
+        :return: None
+        :rtype: None
+        """
+        # Visual Change
+        #   > For the UI, change 'True' / 'False' to 'YES' / 'NO' (eng version)
+        import_state_translation = self.product_lan_inf['misc']['product_import_state_choice']
+        product_import_state_word = import_state_translation[0] \
+            if product_information["product_import_state"] \
+            else import_state_translation[1]
+
+        # Add the new record to the product_list treeview widget in the ui
+        self.product_list.insert(
+            parent='',
+            index='end',
+            text='',
+            values=(
+                product_information["product_name"],
+                product_information["product_quantity"],
+                product_information["product_price"],
+                product_information["product_basic_tax"],
+                product_import_state_word
+            )
+        )
+        self.__clear_input_fields()
+
+    def error_handling(self, error_code: str, alternative_message: str):
+        """
+        Handle an error in the controller and display it to the user
+        :param error_code: Code given by the controller to refer to a specific exception (e. g. TAX-e001)
+        :type error_code: str
+        :param alternative_message: Alternative error message if the language pack do not support the error code
+        :type alternative_message: str
+        :return: None
+        :rtype: None
+        """
+        error_message = self.product_lan_inf['error_handling'].get(error_code)
+        if error_message:
+            self.__show_error_popup_message(message=error_message)
+        else:
+            self.__show_error_popup_message(message=alternative_message)
+
+    def show_receipt(self, receipt_details: dict):
+        """
+        Display the receipt details for the user. The receipt_details dictionary has the following structure:
+
+        receipt_details:dict = {
+            "receipt_total": {
+                "sales_tax": <sales tax>,
+                "total": <total>
+            },
+            "products": {
+                "1": {
+                    "product_name": <the product name>,,
+                    "product_import_state": <the product import state>,
+                    "product_quantity": <the product quantity>,
+                    "taxed_price": <the taxed price>
+                },
+                ...
+                "n": {
+                    ...
+                }
+            }
+        }
+
+        :param receipt_details: Information about the receipt
+        :type receipt_details: dict
+        :return: None
+        :rtype: None
+        """
+        message_str = ""
+        receipt_total_details = receipt_details["receipt_total"]
+        product_details = receipt_details["products"]
+        for product in product_details:
+            import_statement = (
+                    self.product_lan_inf['receipt']['imported'] + " "
+            ) if product_details[product]['product_import_state'] else ""
+            message_str += f"{product_details[product]['product_quantity']}" +\
+                           " " \
+                           f"{import_statement} {product_details[product]['product_name']}:" +\
+                           " " \
+                           f"{product_details[product]['taxed_price']}" \
+                           + "\n"
+        # Add sales tex to string
+        message_str += f"{self.product_lan_inf['receipt']['sales_taxes']}: {receipt_total_details['sales_tax']}" + "\n"
+        # Add total amount to string
+        message_str += f"{self.product_lan_inf['receipt']['total']}: {receipt_total_details['total']}"
+        self.__show_receipt_popup_message(message=message_str)

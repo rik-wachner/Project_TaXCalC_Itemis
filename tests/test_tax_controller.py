@@ -239,7 +239,7 @@ def test_calculate_receipt(create_dummy_tax_ui_object):
 
 
 ###
-# calculate_total()
+# _calculate_total()
 ###
 @pytest.mark.parametrize(
     "products, expected_sales_tax, expected_total",
@@ -423,7 +423,7 @@ def test_calculate_total(create_dummy_tax_ui_object, products, expected_sales_ta
     tax_controller = controller.TaxController(create_dummy_tax_ui_object)
     for product in products:
         tax_controller.add_product(product_information=product)
-    receipt_information: dict = tax_controller.calculate_total()
+    receipt_information: dict = tax_controller._calculate_total()
     assert receipt_information['receipt_total']['sales_tax'] == expected_sales_tax
     assert receipt_information['receipt_total']['total'] == expected_total
 

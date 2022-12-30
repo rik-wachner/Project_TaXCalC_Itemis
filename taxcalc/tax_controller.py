@@ -3,12 +3,24 @@ from taxcalc.tax_product import TaxProduct
 
 
 class TaxController:
+    """
+    Class representing the controller
+    """
     def __init__(self, view: any):
+        """
+        Initialize a TaxController object
+        :param view: User interface object to display information
+        :type view: any
+        """
         self.view = view
         self.taxProducts: list[TaxProduct] = []
 
         # Add reference to UI to get user events
         self.view.add_controller_listener(self)
+
+    ##################
+    # Static Methods #
+    ##################
 
     @staticmethod
     def _check_product_information(product_information: dict):
@@ -167,6 +179,10 @@ class TaxController:
         engine_function = round_tax_solutions.get(solution_calc_engine, "Invalid Engine")
         return round(engine_function(tax_number), 2)
 
+    ##################
+    # Public Methods #
+    ##################
+
     def add_product(self, product_information: dict):
         """
         Adds a new product to the receipt with the following structure:
@@ -209,10 +225,24 @@ class TaxController:
             )
 
     def calculate_receipt(self):
-        receipt = self.calculate_total()
+        """
+        Calculate the receipt's relevant tax information and display it to the user via the UI
+        :return: None
+        :rtype: None
+        """
+        receipt = self._calculate_total()
         self.view.show_receipt(receipt)
 
-    def calculate_total(self) -> dict:
+    def reset_calculation(self):
+        """
+        Reset the current calculation
+        :return: None
+        :rtype: None
+        """
+        self.taxProducts = []
+        self.view.reset_calculation()
+
+    def _calculate_total(self) -> dict:
         """
         Calculating the total cost of the items and the total amounts of sales taxes
 
@@ -232,7 +262,7 @@ class TaxController:
             "product_import_state": <the product import state>
         }
 
-        :return:
+        :return: Receipt information with total, sales tax, and the product price
         :rtype: dict
         """
         product_calculation_info = {}
@@ -256,10 +286,10 @@ class TaxController:
             total_sales_tax += rounded_tax_value * product_information["product_quantity"]
             total += product_taxed_price
             # Add product to dict for ui data transfer
-            product_calculation_info[index] = {
+            product_calculation_info[index+1] = {
                 "product_name": product_information["product_name"],
-                "import_state": product_information["product_import_state"],
-                "quantity": product_information["product_quantity"],
+                "product_import_state": product_information["product_import_state"],
+                "product_quantity": product_information["product_quantity"],
                 "taxed_price": product_taxed_price
             }
         receipt_calculation = {
@@ -269,9 +299,4 @@ class TaxController:
             },
             "products": product_calculation_info
         }
-        print(receipt_calculation)
         return receipt_calculation
-
-    def reset_calculation(self):
-        self.taxProducts = []
-        self.view.reset_calculation()

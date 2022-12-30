@@ -2,6 +2,9 @@ from abc import ABC
 
 
 class TaxBaseError(ABC, Exception):
+    """
+    Class representing an exception or error occurrence in runtime
+    """
     def __init__(self, error_code: str = "TAX-e000", message: str = ""):
         """
         Initialize a TaxBaseError Exception object
