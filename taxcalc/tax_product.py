@@ -8,7 +8,7 @@ class TaxProduct:
         self.basic_tax: int = basic_tax
         self.import_sate: bool = import_state
 
-    def getProductInformation(self):
+    def get_product_information(self):
         return {
             # "product_id": self.id,
             "product_name": self.name,

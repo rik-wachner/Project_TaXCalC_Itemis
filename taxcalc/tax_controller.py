@@ -194,8 +194,8 @@ class TaxController:
                 import_state=bool(product_information["product_import_state"])
             )
             self.taxProducts.append(new_product)
-            # new_product.getProductInformation() == product_information
-            self.view.display_new_record(new_product.getProductInformation())
+            # new_product.get_product_information() == product_information
+            self.view.display_new_record(new_product.get_product_information())
         except TaxBaseError as tax_base_exception:
             self.view.error_handling(message=str(tax_base_exception))
         # Inappropriate argument value (of correct type)
