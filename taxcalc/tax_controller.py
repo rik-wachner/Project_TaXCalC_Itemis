@@ -89,7 +89,7 @@ class TaxController:
         __check_product_price(float(product_information["product_price"]))
 
     @staticmethod
-    def _round_tax(tax_number: float, solution_calc_engine: str = "t4z") -> float:
+    def _round_tax(tax_number: float, solution_calc_engine: str = "rik") -> float:
         """
         Round a given tax float to the nearest 0.05 base by a chosen solution engine
 
