@@ -385,8 +385,8 @@ class TaxUIApp(customtkinter.CTk):
         elif value == self.product_lan_inf['examples']['example_3']:
             load_products.append(["box of perfume", 1, 27.99, 10, True])
             load_products.append(["bottle of perfume", 1, 18.99, 10, False])
-            load_products.append(["headache pills", 1, 9.75, 0, False])
-            load_products.append(["chocolates", 1, 11.25, 0, True])
+            load_products.append(["packet of headache pills", 1, 9.75, 0, False])
+            load_products.append(["box of chocolates", 1, 11.25, 0, True])
         # Use add_new_product() method for inserting the new example products
         for product in load_products:
             self.add_new_product(
