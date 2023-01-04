@@ -251,6 +251,8 @@ class TaxUIApp(customtkinter.CTk):
                     "TAX-e003": "The product quantity cannot be zero (0) or negative (-1, -2, ...) for the calculation",
                     "TAX-e004": "The product quantity cannot be greater then ninety-nine (> 99) for the calculation",
                     "TAX-e005": "The product price cannot be zero (0) or negative (-1, -2, ...) for the calculation",
+                    "TAX-e006": "The product price cannot be equal or larger then '1e+16' for the calculation",
+                    "TAX-e007": "The product tax rate can only be 10% or 0% for the calculation",
                     "PY-e001": "Check the types of your input!" + "\n"
                                "The quantity or price should be numeric with '.' as decimal point",
                     "accept": "OK"
@@ -304,6 +306,8 @@ class TaxUIApp(customtkinter.CTk):
                     "TAX-e003": "Die Produktmenge darf bei der Berechnung nicht 0 oder negativ (-1, -2, ...) sein",
                     "TAX-e004": "Die Produktmenge kann bei der Berechnung nicht groesser als 99 sein",
                     "TAX-e005": "Der Produktpreis kann bei der Berechnung nicht 0 oder negativ (-1, -2, ...) sein.",
+                    "TAX-e006": "Der Produktpreis kann bei der Berechnung nicht größer als '1e+16' sein.",
+                    "TAX-e007": "Die Grundumsatzsteuer kann nur 10% oder 0% betragen.",
                     "PY-e001": "Ueberpruefen Sie die Art Ihrer Eingabe!" + "\n"
                                "Die Menge oder der Preis sollte numerisch sein mit '.' als Dezimalkomma",
                     "accept": "OK"

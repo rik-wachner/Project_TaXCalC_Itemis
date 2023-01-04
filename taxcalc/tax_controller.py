@@ -78,18 +78,27 @@ class TaxController:
 
         def __check_product_price(product_price: float):
             """
-            Check if the product price is greater than 0. If exceeded and negative, an error is thrown
+            Check if the product price is greater than 0. If larger equal to '1e+16' or or negative, an error is thrown
             :param product_price: Product price
             :type product_price: float
             :return: None or raised TaxBaseError exception
-            :rtype: None or a TaxBaseError exception object with error code == 'TAX-e005'
+            :rtype: None or a TaxBaseError exception object with error code == 'TAX-e005' or 'TAX-e006'
             """
             if product_price <= 0:
-                raise TaxBaseError("TAX-e005", "Product price cannot be zero (0) or negative (-1, -2, ...)")
+                raise TaxBaseError("TAX-e005", "Product price cannot be zero (0), negative (-1, -2, ...)")
+            if product_price >= float("1e+16"):
+                raise TaxBaseError("TAX-e006", "Product price cannot be lager or equal to '1e+16'")
 
-            # No ruling for a limit price range -> dangerous because of MAX_INTEGER values in the calculation
-            # if product_price > ?:
-            #    raise TaxBaseError("Product price cannot be greater then ? (> ?)")
+        def __check_product_basic_tax(product_basic_tax: int):
+            """
+            Check if the product basic tax rate is either 0 or 10. If exceeded and negative, an error is thrown
+            :param product_basic_tax: Product basic tax rate
+            :type product_basic_tax: float
+            :return: None or raised TaxBaseError exception
+            :rtype: None or a TaxBaseError exception object with error code == 'TAX-e006'
+            """
+            if product_basic_tax not in [0, 10]:
+                raise TaxBaseError("TAX-e007", "Product basic tax rate can only be 0.0 (0%) or 0.1 (10%)")
 
         # Check 1
         __check_missing_content()
@@ -99,6 +108,7 @@ class TaxController:
         __check_product_quantity(int(product_information["product_quantity"]))
         # Check 4 with cast str -> int
         __check_product_price(float(product_information["product_price"]))
+        __check_product_basic_tax(product_information["product_basic_tax"])
 
     @staticmethod
     def _round_tax(tax_number: float, solution_calc_engine: str = "rik") -> float:
