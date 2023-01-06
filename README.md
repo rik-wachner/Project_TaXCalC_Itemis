@@ -138,7 +138,11 @@ Note:<br>
 The UI will not have test cases, and only the developer, acting as a possible user, will go through
 many walkthroughs of the software.
 
-## VII. Installation (Try it yourself!)
+## VII. Video Walkthrough
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/NXEekp77aCY/0.jpg)](http://www.youtube.com/watch?v=NXEekp77aCY "Video Title")
+
+## VIII. Installation (Try it yourself!)
 
 As described in [chapter V](#v-implementation), the software is written in Python and does not
 include a PyInstaller application to execute. To run and test the software (with tests) on your own,
