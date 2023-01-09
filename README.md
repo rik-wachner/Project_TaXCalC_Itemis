@@ -161,7 +161,7 @@ for example, perform the following steps:
    - Install all packages defined in the <b>requirements.txt</b> with: `pip install -r requirements.txt`
      - The default location of the requirements.txt file is in the root of the repository
      - Don't forget to execute the shell, cmd, or powershell in the directory or change the path to `<project-path>\requirements.txt!`
-5. To run the software, execute the <b>main.py</b> Python file in: `<project-path>\taxcalc`
+5. To run the software, execute the <b>main.py</b> Python file in the root
 6. For experts, you can change the language of the UI by changing the `language_code` parameter to a supported ISO 639 language code
      ```python
      [...] 

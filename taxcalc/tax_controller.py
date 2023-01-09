@@ -1,5 +1,5 @@
-from taxcalc.tax_error_handling import TaxBaseError
-from taxcalc.tax_product import TaxProduct
+from .tax_error_handling import TaxBaseError
+from .tax_product import TaxProduct
 
 
 class TaxController:

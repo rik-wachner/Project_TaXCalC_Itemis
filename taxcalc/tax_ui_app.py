@@ -1,6 +1,6 @@
 import tkinter
 import customtkinter  # https://pypi.org/project/customtkinter/
-from taxcalc.tax_controller import TaxController
+from .tax_controller import TaxController
 
 # Library specific 'global' settings
 customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
