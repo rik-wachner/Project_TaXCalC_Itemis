@@ -144,9 +144,12 @@ many walkthroughs of the software.
 
 ## VIII. Installation (Try it yourself!)
 
-As described in [chapter V](#v-implementation), the software is written in Python and does not
-include a PyInstaller application to execute. To run and test the software (with tests) on your own,
-perform the following steps:
+As described in [chapter V](#v-implementation), the software is written in Python as a Python module and can be run by
+executing the main.py in a Python environment. Furthermore, for Windows, an executable file called "TaXCalC.exe" is
+added to the "executable/windows" project directory, which can be used to test the software without installing Python.
+Because the exe still relies on resources like [customTkinter](https://github.com/TomSchimansky/CustomTkinter), it can
+only be executed inside the 'windows' folder and is not a standalone exe file. To run the software in Python with an IDE
+for example, perform the following steps:
 1. Clone the GitHub 'main' repository, or download and unpack the files
    - Tutorial: [GitHub - 'Cloning a repository'](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
 2. Download the Python interpreter for your operating system if you do not already have Python or a matching virtual environment installed
